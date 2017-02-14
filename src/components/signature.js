@@ -89,10 +89,67 @@ module.exports = function(app) {
           signaturePad.clear();
         });
 
+        var timer;
+
+        // Is Topaz device installed?
+        try {
+          ClearTablet();
+          scope.$parent.hasTablet = true;
+        }
+        catch(e) {
+          scope.$parent.hasTablet = false;
+        }
+
+        // Start recording the signature using Topaz device.
+        scope.component.recordSignature = function() {
+          var canvas  = element[0];
+          var context = canvas.getContext('2d');
+
+          signaturePad.clear();
+          SetDisplayXSize(canvas.width);
+          SetDisplayYSize(canvas.height);
+          SetTabletState(0, timer);
+          SetJustifyMode(0);
+          ClearTablet();
+          if(timer == null)
+          {
+            timer = SetTabletState(1, context, 50);
+          }
+          else
+          {
+            SetTabletState(0, timer);
+            timer = null;
+            timer = SetTabletState(1, context, 50);
+          }
+        };
+
+        // Stop recording the signature using Topaz device.
+        scope.component.stopSignature = function() {
+          if(NumberOfTabletPoints() == 0)
+          {
+            alert("Please sign before continuing");
+          }
+          else
+          {
+            var canvas  = element[0];
+
+            SetTabletState(0, timer);
+            SetImageXSize(canvas.width);
+            SetImageYSize(canvas.height);
+            SetImagePenWidth(5);
+            GetSigImageB64(function(data) {
+              var dataUrl = 'data:image/png;base64,' + data;
+              ngModel.$setViewValue(dataUrl);
+            });
+          }
+        };
+
         // Clear the signature.
         scope.component.clearSignature = function() {
           signaturePad.clear();
           readSignature();
+          if (scope.$parent.hasTablet)
+            ClearTablet();
         };
 
         // Set some CSS properties.
