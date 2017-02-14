@@ -87,6 +87,9 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
+          // Pass through form for running of rules
+          $scope.form = $scope.$parent.form;
+
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
           if (!$scope.builder && $scope.component.calculateValue) {
@@ -419,6 +422,52 @@ module.exports = [
           }
           if ($scope.gridCol !== undefined) {
             $scope.componentId += ('-' + $scope.gridCol);
+          }
+
+          // Watch data to run rules
+          if ($scope.component.rules) {
+            $scope.$watch('data[component.key]', function(newValue, oldValue) {
+              // Don't run rule on initialization
+              // if (newValue === oldValue)
+              //   return;
+
+              // Don't run rule when building form
+              if (!$scope.formioForm)
+                return;
+
+              var dirty  =  $scope.formioForm.$dirty;
+
+              // Don't run rules at the wrong time
+              if (dirty && !$scope.component.runRulesOnChange
+                || !dirty && !$scope.component.runRulesOnLoad)
+                return;
+
+              var user       = '';
+              var data       = $scope.data;
+              var rules      = $scope.component.rules;
+              var parent     = $scope.$parent;
+              var components = FormioUtils.flattenComponents($scope.form.components);
+
+              if (Formio.getUser())
+                user = Formio.getUser().data.email;
+
+              while(parent) {
+                if (parent.data)
+                  data = parent.data;
+                parent = parent.$parent;
+              }
+
+              rules = rules.replace(/({{\s+(.*?)\s+}})/g, function(match, $1, $2) {
+                return $scope.data[$2];
+              });
+
+              var getUser = function(email) {
+                return Formio.makeStaticRequest(Formio.getBaseUrl() + '/user/submission?data.email=' + email);
+              };
+
+              /* jshint evil: true */
+              eval(rules);
+            }, true);
           }
         }
       ]
