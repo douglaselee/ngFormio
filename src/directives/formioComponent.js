@@ -426,21 +426,23 @@ module.exports = [
 
           // Watch data to run rules
           if ($scope.component.rules) {
-            $scope.$watch('data[component.key]', function(newValue, oldValue) {
+            $scope.$watch('data[component.key]', function() {
               // Don't run rule on initialization
               // if (newValue === oldValue)
               //   return;
 
               // Don't run rule when building form
-              if (!$scope.formioForm)
+              if (!$scope.formioForm) {
                 return;
+              }
 
               var dirty  =  $scope.formioForm.$dirty;
 
               // Don't run rules at the wrong time
               if (dirty && !$scope.component.runRulesOnChange
-                || !dirty && !$scope.component.runRulesOnLoad)
+              || !dirty && !$scope.component.runRulesOnLoad) {
                 return;
+              }
 
               var user       = '';
               var data       = $scope.data;
@@ -448,12 +450,14 @@ module.exports = [
               var parent     = $scope.$parent;
               var components = FormioUtils.flattenComponents($scope.form.components);
 
-              if (Formio.getUser())
+              if (Formio.getUser()) {
                 user = Formio.getUser().data.email;
+              }
 
-              while(parent) {
-                if (parent.data)
+              while (parent) {
+                if (parent.data) {
                   data = parent.data;
+                }
                 parent = parent.$parent;
               }
 
