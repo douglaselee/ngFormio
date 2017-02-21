@@ -89,6 +89,7 @@ module.exports = function(app) {
           signaturePad.clear();
         });
 
+        /* eslint-disable */
         var timer;
 
         // Is Topaz device installed?
@@ -151,6 +152,7 @@ module.exports = function(app) {
           if (scope.$parent.hasTablet)
             ClearTablet();
         };
+        /* eslint-enable */
 
         // Set some CSS properties.
         element.css({
