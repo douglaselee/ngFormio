@@ -53,6 +53,7 @@
     "ng-file-upload": "^12.2.13",
     "ng-dialog": "^0.5.9",
     "signature_pad": "^1.5.3",
+    "sig-web-tablet": "file:..\\sig-web-tablet",
     "ui-select": "^0.19.6"
   },
   "browserify": {

@@ -1,4 +1,5 @@
 var fs = require('fs');
+var sw = require('sig-web-tablet');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -89,15 +90,14 @@ module.exports = function(app) {
           signaturePad.clear();
         });
 
-        /* eslint-disable */
         var timer;
 
         // Is Topaz device installed?
         try {
-          ClearTablet();
+          sw.clearTablet();
           scope.$parent.hasTablet = true;
         }
-        catch(e) {
+        catch (e) {
           scope.$parent.hasTablet = false;
         }
 
@@ -107,38 +107,34 @@ module.exports = function(app) {
           var context = canvas.getContext('2d');
 
           signaturePad.clear();
-          SetDisplayXSize(canvas.width);
-          SetDisplayYSize(canvas.height);
-          SetTabletState(0, timer);
-          SetJustifyMode(0);
-          ClearTablet();
-          if(timer == null)
-          {
-            timer = SetTabletState(1, context, 50);
+          sw.setDisplayXSize(canvas.width);
+          sw.setDisplayYSize(canvas.height);
+          sw.setTabletState(0, timer);
+          sw.setJustifyMode(0);
+          sw.clearTablet();
+          if (timer == null) {
+            timer = sw.setTabletState(1, context, 50);
           }
-          else
-          {
-            SetTabletState(0, timer);
+          else {
+            sw.setTabletState(0, timer);
             timer = null;
-            timer = SetTabletState(1, context, 50);
+            timer = sw.setTabletState(1, context, 50);
           }
         };
 
         // Stop recording the signature using Topaz device.
         scope.component.stopSignature = function() {
-          if(NumberOfTabletPoints() == 0)
-          {
-            alert("Please sign before continuing");
+          if (sw.numberOfTabletPoints() === 0) {
+            alert('Please sign before continuing');
           }
-          else
-          {
+          else {
             var canvas  = element[0];
 
-            SetTabletState(0, timer);
-            SetImageXSize(canvas.width);
-            SetImageYSize(canvas.height);
-            SetImagePenWidth(5);
-            GetSigImageB64(function(data) {
+            sw.setTabletState(0, timer);
+            sw.setImageXSize(canvas.width);
+            sw.setImageYSize(canvas.height);
+            sw.setImagePenWidth(5);
+            sw.getSigImageB64(function(data) {
               var dataUrl = 'data:image/png;base64,' + data;
               ngModel.$setViewValue(dataUrl);
             });
@@ -149,10 +145,10 @@ module.exports = function(app) {
         scope.component.clearSignature = function() {
           signaturePad.clear();
           readSignature();
-          if (scope.$parent.hasTablet)
-            ClearTablet();
+          if (scope.$parent.hasTablet) {
+            sw.clearTablet();
+          }
         };
-        /* eslint-enable */
 
         // Set some CSS properties.
         element.css({
