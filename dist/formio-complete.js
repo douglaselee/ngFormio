@@ -1,4 +1,4 @@
-/*! ng-formio v2.10.6 | https://unpkg.com/ng-formio@2.10.6/LICENSE.txt */
+/*! ng-formio v2.11.1 | https://unpkg.com/ng-formio@2.11.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48889,7 +48889,6 @@ module.exports = s3;
 
 },{"native-promise-only":35}],31:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
-var Formio  = _dereq_("../../formio");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -48917,12 +48916,22 @@ var url = function(formio) {
         xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
             // Need to test if xhr.response is decoded or not.
+            var respData = {};
+            try {
+              respData = (typeof xhr.response === 'string') ? JSON.parse(xhr.response) : {};
+              respData = (respData && respData.data) ? respData.data : {};
+            }
+            catch(err) {
+              respData = {};
+            }
+
             resolve({
               storage: 'url',
               name: fileName,
               url: xhr.responseURL + '/' + fileName,
               size: file.size,
-              type: file.type
+              type: file.type,
+              data: respData
             });
           }
           else {
@@ -48940,7 +48949,10 @@ var url = function(formio) {
         }
 
         xhr.open('POST', url);
-        xhr.setRequestHeader('x-jwt-token', Formio.getToken());
+        var token = localStorage.getItem('formioToken');
+        if (token) {
+          xhr.setRequestHeader('x-jwt-token', token);
+        }
         xhr.send(fd);
       });
     },
@@ -48955,7 +48967,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"../../formio":26,"native-promise-only":35}],32:[function(_dereq_,module,exports){
+},{"native-promise-only":35}],32:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -63810,7 +63822,7 @@ module.exports = function(app) {
         var data = $scope.data[$scope.component.key];
         var visible = false;
         angular.forEach(data, function(rowData) {
-          visible = (visible || FormioUtils.isVisible(component, rowData));
+          visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
         });
         return visible;
       };
@@ -68154,23 +68166,43 @@ module.exports = [
 "use strict";
 module.exports = [
   '$filter',
+  '$injector',
   function(
-    $filter
+    $filter,
+    $injector
   ) {
     return function(text, key, builder) {
+      /**
+       * Lookup the available translate libraries, currently supports:
+       * angular-translate: @see https://github.com/angular-translate/angular-translate
+       * angular-gettext: @see https://github.com/rubenv/angular-gettext
+       */
+      var $translate, gettextCatalog;
+      if ($injector.has('$translate')) {
+        $translate = $injector.get('$translate');
+      }
+      else if ($injector.has('gettextCatalog')) {
+        gettextCatalog = $injector.get('gettextCatalog');
+      }
       if (builder) return text;
       try {
-        var translate = $filter('translate');
+        // Translate text using either angular-translate or angular-gettext
+        var translateText = function(text) {
+          if ($translate) return $translate(text);
+          if (gettextCatalog) return gettextCatalog.getString(text);
+          return text;
+        };
+
         // Allow translating by field key which helps with large blocks of html.
         if (key) {
-          var result = translate(key);
+          var result = translateText(key);
           if (result === key) {
-            result = translate(text);
+            result = translateText(text);
           }
           return result;
         }
 
-        return translate(text);
+        return translateText(text);
       }
       catch (e) {
         return text;
@@ -68323,7 +68355,7 @@ app.run([
     );
 
     $templateCache.put('formio/errors.html',
-      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.label || component.placeholder || component.key }} {{'must be higher than' | formioTranslate:null:builder}} {{ component.validate.min - 1 }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.label || component.placeholder || component.key }} {{'must be lower than' | formioTranslate:null:builder}} {{ component.validate.max + 1 }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
+      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:builder}} {{ component.validate.min }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:builder}} {{ component.validate.max }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
     );
   }
 ]);
