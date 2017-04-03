@@ -6,7 +6,6 @@ module.exports = function() {
   return {
 
     // Expose Formio configuration functions
-    setFormOnly: Formio.setFormOnly,
     setBaseUrl: Formio.setBaseUrl,
     getBaseUrl: Formio.getBaseUrl,
     setApiUrl: Formio.setBaseUrl,
