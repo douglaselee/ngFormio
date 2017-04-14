@@ -51,7 +51,10 @@ module.exports = function(app) {
               return;
             }
             var valueSet = !!$scope.data[$scope.component.key];
-            $scope.data[$scope.component.key] = dateValue();
+            var newValue = dateValue();
+            if (newValue) {
+              $scope.data[$scope.component.key] = newValue;
+            }
             if (valueSet) {
               loadComplete();
             }
