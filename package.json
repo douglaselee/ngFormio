@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.15.4",
+  "version": "2.15.6",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -54,7 +54,7 @@
     "ng-dialog": "^0.5.9",
     "signature_pad": "^1.6.0",
     "sig-web-tablet": "file:..\\sig-web-tablet",
-    "ui-select": "^0.19.6"
+    "ui-select": "^0.19.8"
   },
   "browserify": {
     "transform": [
