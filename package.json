@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.15.8",
+  "version": "2.16.1",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -50,8 +50,8 @@
     "formiojs": "file:..\\formiojs",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "ng-dialog": "^1.0.1",
     "ng-file-upload": "^12.2.13",
-    "ng-dialog": "^0.5.9",
     "signature_pad": "^1.6.0",
     "sig-web-tablet": "file:..\\sig-web-tablet",
     "ui-select": "^0.19.8"
