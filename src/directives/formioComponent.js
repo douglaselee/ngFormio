@@ -105,6 +105,11 @@ module.exports = [
           // Pass through form for running of rules
           $scope.form = $scope.$parent.form;
 
+          // Array of components converted to an object for ease of use
+          $scope.componentsObject = function() {
+            return FormioUtils.flattenComponents($scope.form.components, true);
+          };
+
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
           if (!$scope.builder && ($scope.component.calculateValue || (jsonLogic && _get($scope.component, 'validate.json')))) {

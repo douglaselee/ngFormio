@@ -29,9 +29,21 @@ module.exports = function(app) {
               case 'reset':
                 return 'reset';
               case 'event':
+              case 'custom':
               case 'oauth':
               default:
                 return 'button';
+            }
+          };
+
+          var onCustom = function() {
+            try {
+              eval('(function(data, components) { ' + $scope.component.custom + ' })($scope.data, $scope.componentsObject())');
+            }
+            catch (e) {
+              /* eslint-disable no-console */
+              console.warn('An error occurred evaluating custom logic for ' + $scope.component.key, e);
+              /* eslint-enable no-console */
             }
           };
 
@@ -41,6 +53,9 @@ module.exports = function(app) {
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
+                break;
+              case 'custom':
+                onCustom();
                 break;
               case 'reset':
                 $scope.resetForm();
