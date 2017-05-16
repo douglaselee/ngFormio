@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.17.0
+### Changed
+ - Removed sourcemaps from build files.
+
+### Added
+ - Updated bugfix for FOR-404
+ - TableView rendering to all layout components
+
+### Fixed
+ - Issue where form components inside containers, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue where form components inside data grids, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue with the signature component, where the size of the input field was also used for the component which would
+   allow for its footer label to be covered by other components.
+ - Fixing issue where certain api responses would be stored as json strings rather than error messages
+ - Issue where the submit on "action" was passing the wrong object to the submit handlers.
+ - Issue where the select search would not reset when they clear out the search box.
+
 ## 2.16.6
 ### Changed
  - Upgrade formio.js to 2.7.3
