@@ -81,6 +81,11 @@ module.exports = function(app) {
 
             $scope.refreshSubmissions();
 
+            // Open resource editor dialog
+            $scope.$on($scope.component.key + 'ResourceDialog', function() {
+              $scope.newResource();
+            });
+
             // Add a new resource.
             $scope.newResource = function() {
               var template  = '<br>' +

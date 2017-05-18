@@ -52,7 +52,7 @@ module.exports = function(app) {
               case 'submit':
                 return;
               case 'event':
-                $scope.$emit($scope.component.event, $scope.data);
+                $scope.$root.$broadcast($scope.component.event, $scope.data);
                 break;
               case 'custom':
                 onCustom();
