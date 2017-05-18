@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.17.2
+### Fixed
+ - Issue with ngDialog not getting added to module dependencies.
+
+## 2.17.1
+### Fixed
+ - File upload in wizards wasn't working.
+
 ## 2.17.0
 ### Changed
  - Removed sourcemaps from build files.
