@@ -82,7 +82,7 @@ module.exports = function(app) {
             $scope.refreshSubmissions();
 
             // Open resource editor dialog
-            $scope.$on($scope.component.key + 'ResourceDialog', function() {
+            $scope.$on($scope.form.name + '.' + $scope.component.key, function() {
               $scope.newResource();
             });
 
@@ -96,7 +96,7 @@ module.exports = function(app) {
                                       '<h3 class="panel-title">{{ component.addResourceLabel || "Add Resource" | formioTranslate}}</h3>' +
                                     '</div>' +
                                     '<div class="panel-body">' +
-                                      '<formio src="formUrl"></formio>' +
+                                      '<formio src="formUrl" submission="submissionData"></formio>' +
                                     '</div>' +
                                   '</div>' +
                                 '</div>' +
@@ -108,6 +108,15 @@ module.exports = function(app) {
                 scope: $scope,
                 controller: ['$scope', function($scope) {
                   $scope.formUrl = $scope.formio.formsUrl + '/' + $scope.component.resource;
+
+                  if (!$scope.component.multiple) {
+                    if ($scope.data[$scope.component.key]) {
+                      $scope.formUrl += '/submission/' + $scope.data[$scope.component.key]._id;
+                    }
+                    else {
+                      $scope.submissionData = {data: $scope.data};
+                    }
+                  }
 
                   // Bind when the form is loaded.
                   $scope.$on('formLoad', function(event) {
