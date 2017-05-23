@@ -15,7 +15,7 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', 'ngDialog', function($scope, Formio, ngDialog) {
+        controller: ['$scope', 'Formio', 'ngDialog', '$location', function($scope, Formio, ngDialog, $location) {
           if ($scope.builder) return;
           var settings = $scope.component;
           var params = settings.params || {};
@@ -48,9 +48,16 @@ module.exports = function(app) {
               if (settings.selectFields) {
                 params.select = settings.selectFields;
               }
-              if (settings.searchFields && input) {
+              // If they wish to return only some submissions.
+              var makeSelection = false;
+              if (settings.searchFields) {
+                var search = $location.search();
                 angular.forEach(settings.searchFields, function(field) {
-                  params[field] = input;
+                  var key = $scope.component.key + '.' + field;
+                  if (search[key]) {
+                    params[field] = search[key];
+                    makeSelection = true;
+                  }
                 });
               }
 
@@ -64,6 +71,17 @@ module.exports = function(app) {
                 }
                 else {
                   $scope.selectItems = submissions;
+                  // If only one choice then select it.
+                  if (makeSelection && submissions.length === 1) {
+                    var component = $scope.component;
+                    var data      = $scope.data;
+                    if (component.multiple) {
+                      data[component.key] = submissions;
+                    }
+                    else {
+                      data[component.key] = submissions[0];
+                    }
+                  }
                 }
                 $scope.hasNextPage = (submissions.length >= params.limit) && ($scope.selectItems.length < submissions.serverCount);
               })['finally'](function() {
@@ -81,11 +99,6 @@ module.exports = function(app) {
 
             $scope.refreshSubmissions();
 
-            // Open resource editor dialog
-            $scope.$on($scope.form.name + '.' + $scope.component.key, function() {
-              $scope.newResource();
-            });
-
             // Add a new resource.
             $scope.newResource = function() {
               var template  = '<br>' +
@@ -96,7 +109,7 @@ module.exports = function(app) {
                                       '<h3 class="panel-title">{{ component.addResourceLabel || "Add Resource" | formioTranslate}}</h3>' +
                                     '</div>' +
                                     '<div class="panel-body">' +
-                                      '<formio src="formUrl" submission="submissionData"></formio>' +
+                                      '<formio src="formUrl"></formio>' +
                                     '</div>' +
                                   '</div>' +
                                 '</div>' +
@@ -108,15 +121,6 @@ module.exports = function(app) {
                 scope: $scope,
                 controller: ['$scope', function($scope) {
                   $scope.formUrl = $scope.formio.formsUrl + '/' + $scope.component.resource;
-
-                  if (!$scope.component.multiple) {
-                    if ($scope.data[$scope.component.key]) {
-                      $scope.formUrl += '/submission/' + $scope.data[$scope.component.key]._id;
-                    }
-                    else {
-                      $scope.submissionData = {data: $scope.data};
-                    }
-                  }
 
                   // Bind when the form is loaded.
                   $scope.$on('formLoad', function(event) {
