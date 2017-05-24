@@ -1,4 +1,4 @@
-/*! ng-formio v2.17.2 | https://unpkg.com/ng-formio@2.17.2/LICENSE.txt */
+/*! ng-formio v2.18.1 | https://unpkg.com/ng-formio@2.18.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -49276,6 +49276,17 @@ module.exports = {
   },
 
   /**
+   * Returns if this component has a conditional statement.
+   *
+   * @param component - The component JSON schema.
+   *
+   * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
+   */
+  hasCondition: function hasCondition(component) {
+    return component.hasOwnProperty('customConditional') && component.customConditional || component.hasOwnProperty('conditional') && component.conditional && component.conditional.when || component.hasOwnProperty('conditional') && component.conditional && component.conditional.json;
+  },
+
+  /**
    * Checks the conditions for a provided component and data.
    *
    * @param component
@@ -59138,9 +59149,13 @@ return hooks;
     var forceElementsReload = { html: false, body: false };
     var scopes = {};
     var openIdStack = [];
+    var activeBodyClasses = [];
     var keydownIsBound = false;
     var openOnePerName = false;
+    var closeByNavigationDialogStack = [];
 
+    var UI_ROUTER_VERSION_LEGACY = 'legacy';
+    var UI_ROUTER_VERSION_ONE_PLUS = '1.0.0+';
 
     m.provider('ngDialog', function () {
         var defaults = this.defaults = {
@@ -59310,11 +59325,17 @@ return hooks;
                     closeDialogElement: function($dialog, value) {
                         var options = $dialog.data('$ngDialogOptions');
                         $dialog.remove();
-                        if (dialogsCount === 0) {
+
+                        activeBodyClasses.splice(activeBodyClasses.indexOf(options.bodyClassName), 1);
+                        if (activeBodyClasses.indexOf(options.bodyClassName) === -1) {
                             $elements.html.removeClass(options.bodyClassName);
                             $elements.body.removeClass(options.bodyClassName);
+                        }
+
+                        if (dialogsCount === 0) {
                             privateMethods.resetBodyPadding();
                         }
+
                         $rootScope.$broadcast('ngDialog.closed', $dialog, value);
                     },
 
@@ -59546,17 +59567,23 @@ return hooks;
                     },
 
                     detectUIRouter: function() {
-                        //Detect if ui-router module is installed if not return false
-                        try {
-                            angular.module('ui.router');
-                            return true;
-                        } catch(err) {
-                            return false;
+                        // Detect if ui-router module is installed
+                        // Returns ui-router version string if installed
+                        // Otherwise false
+
+                        if ($injector.has('$transitions')) {
+                            // Only 1.0.0+ ui.router allows us to inject $transitions
+                            return UI_ROUTER_VERSION_ONE_PLUS;
                         }
+                        else if ($injector.has('$state')) {
+                            // The legacy ui.router allows us to inject $state
+                            return UI_ROUTER_VERSION_LEGACY;
+                        }
+                        return false;
                     },
 
                     getRouterLocationEventName: function() {
-                        if(privateMethods.detectUIRouter()) {
+                        if (privateMethods.detectUIRouter()) {
                             return '$stateChangeStart';
                         }
                         return '$locationChangeStart';
@@ -59758,6 +59785,7 @@ return hooks;
                                 var widthDiffs = $window.innerWidth - $elements.body.prop('clientWidth');
                                 $elements.html.addClass(options.bodyClassName);
                                 $elements.body.addClass(options.bodyClassName);
+                                activeBodyClasses.push(options.bodyClassName);
                                 var scrollBarWidth = widthDiffs - ($window.innerWidth - $elements.body.prop('clientWidth'));
                                 if (scrollBarWidth > 0) {
                                     privateMethods.setBodyPadding(scrollBarWidth);
@@ -59788,11 +59816,7 @@ return hooks;
                             }
 
                             if (options.closeByNavigation) {
-                                var eventName = privateMethods.getRouterLocationEventName();
-                                $rootScope.$on(eventName, function ($event) {
-                                    if (privateMethods.closeDialog($dialog) === false)
-                                        $event.preventDefault();
-                                });
+                                closeByNavigationDialogStack.push($dialog);
                             }
 
                             if (options.preserveFocus) {
@@ -59971,6 +59995,31 @@ return hooks;
                         }
                     }
                 );
+
+                // Listen to navigation events to close dialog
+                var uiRouterVersion = privateMethods.detectUIRouter();
+                if (uiRouterVersion === UI_ROUTER_VERSION_ONE_PLUS) {
+                    var $transitions = $injector.get('$transitions');
+                    $transitions.onStart({}, function (trans) {
+                        while (closeByNavigationDialogStack.length > 0) {
+                            var toCloseDialog = closeByNavigationDialogStack.pop();
+                            if (privateMethods.closeDialog(toCloseDialog) === false) {
+                                return false;
+                            }
+                        }
+                    });
+                }
+                else {
+                    var eventName = uiRouterVersion === UI_ROUTER_VERSION_LEGACY ? '$stateChangeStart' : '$locationChangeStart';
+                    $rootScope.$on(eventName, function ($event) {
+                        while (closeByNavigationDialogStack.length > 0) {
+                            var toCloseDialog = closeByNavigationDialogStack.pop();
+                            if (privateMethods.closeDialog(toCloseDialog) === false) {
+                                $event.preventDefault();
+                            }
+                        }
+                    });
+                }
 
                 return publicMethods;
             }];
@@ -71063,6 +71112,7 @@ module.exports = function() {
         }
         $scope.currentPage = session ? session.page : 0;
         $scope.formioAlerts = [];
+        $scope.formioOptions = $scope.formioOptions || {};
 
         var getForm = function() {
           var element = $element.find('#formio-wizard-form');
@@ -71074,6 +71124,12 @@ module.exports = function() {
 
         // Show the current page.
         var showPage = function(scroll) {
+          // When allowing navigate on invsalid
+          // prev page alert can be visible.
+          // Let's clear it
+          $scope.showAlerts(null);
+          $scope.pageWasVisited[$scope.currentPage] = true;
+
           $scope.wizardLoaded = false;
           $scope.page.components = [];
           $scope.page.components.length = 0;
@@ -71109,6 +71165,18 @@ module.exports = function() {
             }
           });
         }
+
+        // We can be comming back with the 'prev' button.
+        // Wait for the form to be loaded.
+        // Then timeout to wait the loaded form to be rendered
+        // before checking for errors.
+        $scope.$on('formLoad', function() {
+          if ($scope.pageHasErrors[$scope.currentPage]) {
+            $timeout(function() {
+              $scope.checkErrors();
+            });
+          }
+        });
 
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
@@ -71147,6 +71215,22 @@ module.exports = function() {
         $scope.submit = function() {
           if ($scope.checkErrors()) {
             return;
+          }
+
+          // We want to submit, but free navigation is enabled.
+          // Lets check if previous pages where not visited or has errors.
+          // If find one, stop searching, go to that page and do not continue with the submission.
+          if ($scope.formioOptions.wizardFreeNavigation) {
+            var backToPage = null;
+            for (var i = 0; i < $scope.pages.length; i++) {
+              if ($scope.pageHasErrors[i] || !$scope.pageWasVisited[i]) {
+                backToPage = i;
+                break;
+              }
+            }
+            if (backToPage !== null) {
+              return $scope.goto(backToPage);
+            }
           }
 
           // Create a sanitized submission object.
@@ -71267,10 +71351,20 @@ module.exports = function() {
           $scope.$emit('cancel');
         };
 
+        $scope.pageHasErrors = {};
+        $scope.pageWasVisited = {};
+
         // Move onto the next page.
         $scope.next = function() {
-          if ($scope.checkErrors()) {
-            return;
+          var errors = $scope.checkErrors();
+          if (errors) {
+            $scope.pageHasErrors[$scope.currentPage] = true;
+            if (!$scope.formioOptions.wizardFreeNavigation) {
+              return;
+            }
+          }
+          else {
+            $scope.pageHasErrors[$scope.currentPage] = false;
           }
           if ($scope.currentPage >= ($scope.pages.length - 1)) {
             return;
@@ -71297,6 +71391,8 @@ module.exports = function() {
           if (page >= $scope.pages.length) {
             return;
           }
+          var errors = $scope.checkErrors();
+          $scope.pageHasErrors[$scope.currentPage] = errors;
           $scope.currentPage = page;
           showPage(true);
         };
@@ -72169,7 +72265,7 @@ app.run([
     );
 
     $templateCache.put('formio-wizard.html',
-      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner bg-success\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
+      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage) && !formioOptions.wizardFreeNavigation, active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner\"\n        ng-class=\"{\n          'bg-success': !pageHasErrors[$index],\n          'bg-danger': pageHasErrors[$index],\n          'bg-warning': !pageWasVisited[$index] && currentPage > $index\n        }\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
     );
 
     $templateCache.put('formio-delete.html',
@@ -72257,7 +72353,9 @@ module.exports = function() {
     setApiUrl: Formio.setBaseUrl,
     getApiUrl: Formio.getBaseUrl,
     setAppUrl: Formio.setAppUrl,
+    setProjectUrl: Formio.setProjectUrl,
     getAppUrl: Formio.getAppUrl,
+    getProjectUrl: Formio.getProjectUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
     providers: Formio.providers,
