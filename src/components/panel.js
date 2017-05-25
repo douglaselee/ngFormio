@@ -8,6 +8,7 @@ module.exports = function(app) {
         template: 'formio/components/panel.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'panel',
           input: false,
           title: '',
