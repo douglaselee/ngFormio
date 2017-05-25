@@ -104,7 +104,7 @@ module.exports = [
 
           // Array of components converted to an object for ease of use
           $scope.componentsObject = function() {
-            return FormioUtils.flattenComponents($scope.form.components, true);
+            return FormioUtils.flattenComponents($scope.$parent.form.components, true);
           };
 
           // FOR-71 - Dont watch in the builder view.
