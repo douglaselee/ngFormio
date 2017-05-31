@@ -1,4 +1,4 @@
-/*! ng-formio v2.18.2 | https://unpkg.com/ng-formio@2.18.2/LICENSE.txt */
+/*! ng-formio v2.18.3 | https://unpkg.com/ng-formio@2.18.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -69354,8 +69354,15 @@ module.exports = function(app) {
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
-                    if (input === lastInput) {
-                      return;
+                    if (typeof input === 'string') {
+                      if (input === lastInput) {
+                        return;
+                      }
+                      else {
+                        // Since the search has changed, reset the limit and skip.
+                        options.params.limit = $scope.component.limit || 100;
+                        options.params.skip = 0;
+                      }
                     }
 
                     lastInput = input;
@@ -69401,6 +69408,9 @@ module.exports = function(app) {
 
                       if (data.length < options.params.limit) {
                         $scope.hasNextPage = false;
+                      }
+                      else {
+                        $scope.hasNextPage = true;
                       }
                       if (append) {
                         $scope.selectItems = $scope.selectItems.concat(data);
@@ -70347,10 +70357,11 @@ module.exports = function() {
           if (form.submitting) {
             return true;
           }
-          form.$pristine = false;
+          form.$setDirty(true);
           for (var key in form) {
-            if (form[key] && form[key].hasOwnProperty('$pristine')) {
-              form[key].$pristine = false;
+            if (form[key] && form[key].$validate) {
+              form[key].$setDirty(true);
+              form[key].$validate();
             }
           }
           return !form.$valid;
