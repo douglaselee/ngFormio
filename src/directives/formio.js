@@ -171,7 +171,7 @@ module.exports = function() {
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,
           submission: true
-        });
+        }) || new Formio();
 
         $scope.checkErrors = function(form) {
           if (form.submitting) {
