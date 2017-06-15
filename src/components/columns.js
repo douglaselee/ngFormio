@@ -12,7 +12,7 @@ module.exports = function(app) {
         settings: {
           clearOnHide: false,
           input: false,
-          tableView: true,
+          tableView: false,
           key: 'columns',
           columns: [{components: [], width: 6, offset: 0, push: 0, pull: 0},
                     {components: [], width: 6, offset: 0, push: 0, pull: 0}]

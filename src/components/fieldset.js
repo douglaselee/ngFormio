@@ -13,7 +13,7 @@ module.exports = function(app) {
           clearOnHide: false,
           key: 'fieldset',
           input: false,
-          tableView: true,
+          tableView: false,
           legend: '',
           components: []
         },
