@@ -44,13 +44,25 @@ module.exports = function(app) {
                 return;
               }
               $scope.resourceLoading = true;
+
               // If they wish to return only some fields.
               if (settings.selectFields) {
                 params.select = settings.selectFields;
               }
+
               // If they wish to return only some submissions.
               var makeSelection = false;
-              if (settings.searchFields) {
+              if (settings.searchFields && input) {
+                angular.forEach(settings.searchFields, function(field) {
+                  if (field === '_id') {
+                    delete params[field];
+                  }
+                  else {
+                    params[field] = input;
+                  }
+                });
+              }
+              else if (settings.searchFields && input === undefined) {
                 var search = $location.search();
                 angular.forEach(settings.searchFields, function(field) {
                   var key = $scope.component.key + '.' + field;
@@ -59,6 +71,11 @@ module.exports = function(app) {
                     makeSelection = true;
                   }
                 });
+              }
+
+              // If not loading more then start from the beginning.
+              if (!append) {
+                params.skip = 0;
               }
 
               // Load the submissions.
@@ -139,7 +156,7 @@ module.exports = function(app) {
                       data[component.key] = submission;
                     }
 
-                    $scope.refreshSubmissions();
+                    $scope.refreshSubmissions(null);
                     $scope.closeThisDialog(submission);
                   });
                 }]
