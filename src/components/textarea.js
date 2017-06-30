@@ -61,6 +61,23 @@ module.exports = function(app) {
                       }
                     });
                 }
+                function update() {
+                    var shouldShow = !editor.session.getValue().length;
+                    var node = editor.renderer.emptyMessageNode;
+                    if (!shouldShow && node) {
+                        editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+                        editor.renderer.emptyMessageNode = null;
+                    }
+                    else if (shouldShow && !node) {
+                        node = editor.renderer.emptyMessageNode = document.createElement('div');
+                        node.innerHTML = $scope.component.placeholder.replace('\n', '<br>');
+                        node.className = 'ace_invisible ace_emptyMessage';
+                        node.style.padding = '0 9px';
+                        editor.renderer.scroller.appendChild(node);
+                    }
+                }
+                editor.on('input', update);
+                setTimeout(update, 100);
               }
             };
             return 'formio/components/textaceeditor.html';
