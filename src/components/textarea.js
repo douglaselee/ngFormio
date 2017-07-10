@@ -37,50 +37,7 @@ module.exports = function(app) {
             return 'formio/components/texteditor.html';
           }
           else if (!$scope.readOnly && $scope.component.components) {
-            $scope.aceOptions = {
-              useWrapMode: true,
-              showGutter: true,
-              theme: 'dawn',
-              mode: 'javascript',
-              showIndentGuides: true,
-              showPrintMargin: false,
-              onLoad: function(editor) {
-                // Disable message: 'Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message'
-                editor.$blockScrolling = Infinity;
-                editor.setOptions({enableBasicAutocompletion: true});
-                /* eslint-disable no-undef*/
-                var tools = ace.require('ace/ext/language_tools');
-                /* eslint-enable  no-undef*/
-                if (tools.completed !== true) {
-                    tools.completed   = true;
-                    tools.addCompleter({
-                      getCompletions: function(editor, session, pos, prefix, callback) {
-                        callback(null, _.map($scope.component.components, function(comp) {
-                          return {name: comp.key, value: comp.key, score: 1000, meta: 'component'};
-                        }));
-                      }
-                    });
-                }
-                function update() {
-                    var shouldShow = !editor.session.getValue().length;
-                    var node = editor.renderer.emptyMessageNode;
-                    if (!shouldShow && node) {
-                        editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
-                        editor.renderer.emptyMessageNode = null;
-                    }
-                    else if (shouldShow && !node) {
-                        node = editor.renderer.emptyMessageNode = document.createElement('div');
-                        node.innerHTML = $scope.component.placeholder.replace('\n', '<br>');
-                        node.className = 'ace_invisible ace_emptyMessage';
-                        node.style.padding = '0 9px';
-                        editor.renderer.scroller.appendChild(node);
-                    }
-                }
-                editor.on('input', update);
-                setTimeout(update, 100);
-              }
-            };
-            return 'formio/components/textaceeditor.html';
+            return 'formio/components/scripteditor.html';
           }
           return 'formio/components/textarea.html';
         },
@@ -122,8 +79,8 @@ module.exports = function(app) {
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/texteditor.html', 'utf8')
       ));
-      $templateCache.put('formio/components/textaceeditor.html', FormioUtils.fieldWrap(
-        fs.readFileSync(__dirname + '/../templates/components/textaceeditor.html', 'utf8')
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/components/scripteditor.html', 'utf8')
       ));
     }
   ]);
