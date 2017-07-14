@@ -39,7 +39,7 @@ module.exports = function(app) {
           if ($scope.readOnly && $scope.component.wysiwyg) {
             return 'formio/componentsView/content.html';
           }
-          if (!$scope.readOnly && $scope.component.components) {
+          if (!$scope.readOnly && $scope.component.editorComponents) {
             return 'formio/components/scripteditor.html';
           }
           return 'formio/components/textarea.html';
