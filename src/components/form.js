@@ -31,7 +31,7 @@ module.exports = function(app) {
               url += '/project/' + $scope.component.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
             url = (new Formio(url, {base: baseUrl})).formUrl;
