@@ -29,7 +29,6 @@ module.exports = function(app) {
             settings.defaultValue = [];
           }
           if (settings.resource) {
-            $scope.options = $scope.options || {};
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
             var url = baseUrl;
             if (settings.project) {
