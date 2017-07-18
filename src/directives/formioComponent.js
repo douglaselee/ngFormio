@@ -127,11 +127,6 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
-          // Array of components converted to an object for ease of use
-          $scope.componentsObject = function() {
-            return FormioUtils.flattenComponents($scope.$parent.form.components, true);
-          };
-
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
           if (!$scope.builder && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {

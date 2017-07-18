@@ -19,7 +19,7 @@ module.exports = function(app) {
           disableOnInvalid: false,
           theme: 'primary'
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.builder) return;
           var settings = $scope.component;
           $scope.getButtonType = function() {
@@ -38,7 +38,8 @@ module.exports = function(app) {
 
           var onCustom = function() {
             try {
-              eval('(function(data, components) { ' + $scope.component.custom + ' })($scope.data, $scope.componentsObject())');
+              var components = FormioUtils.flattenComponents($scope.$parent.form.components, true);
+              eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
             }
             catch (e) {
               /* eslint-disable no-console */
