@@ -67,6 +67,13 @@ module.exports = function(app) {
           }
         };
 
+        // Set the width and height of the canvas.
+        // Reset size if element changes visibility.
+        scope.$watch('component.display', function() {
+          setDimension('width');
+          setDimension('height');
+        });
+
         // Create the signature pad.
         var signaturePad = new SignaturePad(element[0], {
           minWidth: scope.component.minWidth,
@@ -82,19 +89,6 @@ module.exports = function(app) {
         scope.$watch('component.backgroundColor', function(newValue) {
           signaturePad.backgroundColor = newValue;
           signaturePad.clear();
-        });
-
-        // Set the width and height of the canvas.
-        // Reset size if element changes visibility.
-        // Use setTimeout so parent DIV client width and height are meaningful
-        scope.$watch('component.display', function() {
-          setTimeout(function() {
-            setDimension('width');
-            setDimension('height');
-            signaturePad.backgroundColor = scope.component.backgroundColor;
-            signaturePad.clear();
-            signaturePad.fromDataURL(ngModel.$viewValue);
-          });
         });
 
         var timer;
