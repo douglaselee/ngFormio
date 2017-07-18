@@ -38,7 +38,9 @@ module.exports = function(app) {
 
           var onCustom = function() {
             try {
+              /* eslint-disable no-unused-vars */
               var components = FormioUtils.flattenComponents($scope.$parent.form.components, true);
+              /* eslint-enable no-unused-vars */
               eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
             }
             catch (e) {
