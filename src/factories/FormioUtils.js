@@ -354,7 +354,7 @@ module.exports = function() {
       var template =
         '<div ng-if="!component.multiple">' +
           inputLabel +
-          '<div class="input-group" ng-style="{width: component.style.width}">' +
+          '<div class="input-group">' +
             '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
             input +
             requiredInline +
@@ -371,7 +371,7 @@ module.exports = function() {
           inputLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
             '<td>' +
-              '<div class="input-group" ng-style="{width: component.style.width}">' +
+              '<div class="input-group">' +
                 '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
                   multiInput +
                   requiredInline +
