@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.21.3
+### Fixed
+ - The download url for pdf to use the core javascript library.
+ - Fixed crash in FormioUtils each error handling assigning property to a string
+ - Search and filter for Select component.
+
 ## 2.21.2
 ### Fixed
  - Issues with number/floats not parsing correctly.
