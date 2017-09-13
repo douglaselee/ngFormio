@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.23.2
+### Fixed
+ - Issue where the urls for the Resource and Select options could get in bad state.
+
+## 2.23.1
+### Fixed
+ - Issue with the form component for certain option configurations.
+
+## 2.23.0
+### Added
+ - EditGrid component
+
+## 2.22.6
+### Fixed
+ - Form component
+
+### Added
+ - Validation feedback on the submit button for a form with errors.
+
 ## 2.22.5
 ### Fixed
  - Default values for multi value fields no longer defaulted to have one field already open.
