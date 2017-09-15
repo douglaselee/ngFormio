@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.2 | https://unpkg.com/ng-formio@2.23.2/LICENSE.txt */
+/*! ng-formio v2.23.3 | https://unpkg.com/ng-formio@2.23.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -2946,11 +2946,8 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     },
     "var": function(a, b) {
       var not_found = (b === undefined) ? null : b;
-      var data = this;
-      if(typeof a === "undefined" || a==="" || a===null) {
-        return data;
-      }
       var sub_props = String(a).split(".");
+      var data = this;
       for(var i = 0; i < sub_props.length; i++) {
         if(data === null) {
           return not_found;
@@ -3002,17 +2999,17 @@ http://ricostacruz.com/cheatsheets/umdjs.html
 
   jsonLogic.is_logic = function(logic) {
     return (
-      typeof logic === "object" && // An object
-      logic !== null && // but not null
-      ! Array.isArray(logic) && // and not an array
-      Object.keys(logic).length === 1 // with exactly one key
+      logic !== null && typeof logic === "object" && ! Array.isArray(logic)
     );
   };
 
   /*
   This helper will defer to the JsonLogic spec as a tie-breaker when different language interpreters define different behavior for the truthiness of primitives.  E.g., PHP considers empty arrays to be falsy, but Javascript considers them to be truthy. JsonLogic, as an ecosystem, needs one consistent answer.
 
-  Spec and rationale here: http://jsonlogic.com/truthy
+  Literal | JS    |  PHP  |  JsonLogic
+  --------+-------+-------+---------------
+  []      | true  | false | false
+  "0"     | true  | false | true
   */
   jsonLogic.truthy = function(value) {
     if(Array.isArray(value) && value.length === 0) {
@@ -3048,7 +3045,6 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     var values = logic[op];
     var i;
     var current;
-    var scopedLogic, scopedData, filtered, initial;
 
     // easy syntax for unary operators, like {"var" : "x"} instead of strict {"var" : ["x"]}
     if( ! Array.isArray(values)) {
@@ -3093,75 +3089,8 @@ http://ricostacruz.com/cheatsheets/umdjs.html
         }
       }
       return current; // Last
-
-
-
-
-    }else if(op === 'filter'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-      // Return only the elements from the array in the first argument,
-      // that return truthy when passed to the logic in the second argument.
-      // For parity with JavaScript, reindex the returned array
-      return scopedData.filter(function(datum){
-          return jsonLogic.truthy( jsonLogic.apply(scopedLogic, datum));
-      });
-  }else if(op === 'map'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-
-      return scopedData.map(function(datum){
-          return jsonLogic.apply(scopedLogic, datum);
-      });
-
-  }else if(op === 'reduce'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      initial = typeof values[2] !== 'undefined' ? values[2] : null;
-
-      if ( ! Array.isArray(scopedData)) {
-          return initial;
-      }
-
-      return scopedData.reduce(
-          function(accumulator, current){
-              return jsonLogic.apply(
-                  scopedLogic,
-                  {'current':current, 'accumulator':accumulator}
-              );
-          },
-          initial
-      );
-
-    }else if(op === "all") {
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      // All of an empty set is false. Note, some and none have correct fallback after the for loop
-      if( ! scopedData.length) {
-        return false;
-      }
-      for(i=0; i < scopedData.length; i+=1) {
-        if( ! jsonLogic.truthy( jsonLogic.apply(scopedLogic, scopedData[i]) )) {
-          return false; // First falsy, short circuit
-        }
-      }
-      return true; // All were truthy
-    }else if(op === "none") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length === 0;
-
-    }else if(op === "some") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length > 0;
     }
+
 
     // Everyone else gets immediate depth-first recursion
     values = values.map(function(val) {
@@ -15573,6 +15502,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.builder) return;
+          var clicked = false;
           var settings = $scope.component;
           $scope.getButtonType = function() {
             switch (settings.action) {
@@ -15589,7 +15519,7 @@ module.exports = function(app) {
           };
 
           $scope.hasError = function() {
-            return (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+            return clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
           };
 
           var onCustom = function() {
@@ -15611,6 +15541,7 @@ module.exports = function(app) {
           };
 
           var onClick = function() {
+            clicked = true;
             switch (settings.action) {
               case 'submit':
                 return;
@@ -15912,7 +15843,7 @@ module.exports = function(app) {
       );
 
       $templateCache.put('formio/componentsView/columns.html',
-        "<div class=\"row\">\n  <div ng-show=\"column.width\" ng-class=\"'col-sm-' + column.width + ' col-sm-offset-' + column.offset + ' col-sm-push-' + column.push + ' col-sm-pull-' + column.pull\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component-view\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      form=\"form\"\n      submission=\"submission\"\n      ignore=\"ignore\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component-view\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      form=\"form\"\n      submission=\"submission\"\n      ignore=\"ignore\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
       );
     }
   ]);
@@ -22342,7 +22273,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><spann class=\"glyphicon glyphicon-zoom-in\"></spann></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
