@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.23.5
+### Added
+ - Mask textfields if input should be hidden.
+ - Tooltips to components
+
+### Fixed
+ - Issue where the form component would not refresh when new submission data was presented.
 
 ## 2.23.4
 ### Fixed
