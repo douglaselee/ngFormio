@@ -1,3 +1,5 @@
+require('angular-translate');
+require('angular-translate-loader-static-files');
 require('./polyfills/polyfills');
 var fs = require('fs');
 
@@ -12,7 +14,8 @@ var app = angular.module('formio', [
   'ngFileUpload',
   'ngFileSaver',
   'ui.ace',
-  'ckeditor'
+  'ckeditor',
+  'pascalprecht.translate'
 ]);
 
 /**
@@ -30,6 +33,8 @@ app.factory('FormioUtils', require('./factories/FormioUtils'));
 app.factory('formioInterceptor', require('./factories/formioInterceptor'));
 
 app.factory('formioTableView', require('./factories/formioTableView'));
+
+app.factory('langStorage', require('./factories/langStorage'));
 
 app.directive('formio', require('./directives/formio'));
 
@@ -68,10 +73,21 @@ app.filter('trustAsResourceUrl', require('./filters/trusturl'));
 app.config([
   '$httpProvider',
   '$injector',
+  '$translateProvider',
   function(
     $httpProvider,
-    $injector
+    $injector,
+    $translateProvider
   ) {
+    $translateProvider.useStaticFilesLoader({
+        prefix: '/assets/languages/',
+        suffix: '.json'
+    });
+    $translateProvider.preferredLanguage('ENGLISH');
+    $translateProvider.useStorage('langStorage');
+    $translateProvider.storageKey('language');
+    $translateProvider.useSanitizeValueStrategy('escapeParameters');
+
     if (!$httpProvider.defaults.headers.get) {
       $httpProvider.defaults.headers.get = {};
     }
