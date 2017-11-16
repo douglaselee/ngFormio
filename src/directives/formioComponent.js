@@ -175,6 +175,17 @@ module.exports = [
 
               return styles;
             }
+
+            if (component.style && component.style.width) {
+              var width = component.style.width;
+
+              //  Adjust for remove button
+              if (width.slice(-2) === 'px' && component.multiple) {
+                  width = parseInt(width, 10) - 75 + 'px';
+              }
+
+              return {width: width};
+            }
           };
 
           $scope.topOrLeftOptionLabel = FormioUtils.optionsLabelPositionWrapper(FormioUtils.topOrLeftOptionLabel);

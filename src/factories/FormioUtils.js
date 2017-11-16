@@ -364,7 +364,7 @@ module.exports = function() {
           '<table class="table table-bordered" ng-style="getInputGroupStyles(component)">' +
             '<tr ng-repeat="value in data[component.key] track by $index">' +
               '<td>' +
-                '<div class="input-group">' +
+                '<div class="input-group" ng-style="getInputGroupStyles(component)">' +
                   '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
                     multiInput +
                     requiredInline +
