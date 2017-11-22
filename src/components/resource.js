@@ -122,6 +122,13 @@ module.exports = function(app) {
 
             $scope.refreshSubmissions();
 
+            // Handle broadcast from button script.
+            $scope.$on('addResource', function(event, id) {
+              if ($scope.componentId === id) {
+                $scope.newResource();
+              }
+            });
+
             // Add a new resource.
             $scope.newResource = function() {
               var template  = '<br>' +
