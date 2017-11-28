@@ -39,12 +39,14 @@ module.exports = [
         '$http',
         '$controller',
         'FormioUtils',
+        'Formio',
         '$timeout',
         function(
           $scope,
           $http,
           $controller,
           FormioUtils,
+          Formio,
           $timeout
         ) {
           $scope.options = $scope.options || {};
@@ -226,7 +228,7 @@ module.exports = [
           // Calculate value when data changes.
           if (!$scope.options.building && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
             $scope.$watch('data', function() {
-              FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
+              FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data, Formio.getUser());
 
               // Process jsonLogic stuff if present.
               if (_get($scope.component, 'validate.json')) {
