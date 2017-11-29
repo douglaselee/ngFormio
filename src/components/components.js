@@ -17,6 +17,11 @@ module.exports = function(app) {
         groups[name] = group;
       },
       register: function(type, component, group) {
+        // Change default setting for all types
+        if (component && component.settings) {
+          component.settings.clearOnHide = false;
+        }
+
         if (!components[type]) {
           components[type] = component;
         }
