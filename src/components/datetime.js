@@ -65,7 +65,7 @@ module.exports = function(app) {
           label: '',
           key: 'datetimeField',
           placeholder: '',
-          format: 'yyyy-MM-dd HH:mm a',
+          format: 'MM/dd/yyyy HH:mm a',
           enableDate: true,
           enableTime: true,
           defaultDate: '',
