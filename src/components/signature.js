@@ -22,7 +22,7 @@ module.exports = function(app) {
           width: '100%',
           height: '150',
           penColor: 'black',
-          backgroundColor: 'rgb(245,245,235)',
+          backgroundColor: 'rgba(255,255,255,0)',
           minWidth: '0.5',
           maxWidth: '2.5',
           protected: false,
