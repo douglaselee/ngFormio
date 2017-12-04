@@ -42,13 +42,18 @@ module.exports = function(app) {
           };
 
           var onCustom = function() {
+            if (!$scope.component.custom) {
+              return;
+            }
+
             try {
               /* eslint-disable no-unused-vars */
               var parent = $scope.$parent;
               while (!parent.form) {
                 parent = parent.$parent;
               }
-              var components = FormioUtils.flattenComponents(parent.form.components, true);
+              var form       = parent.form;
+              var components = FormioUtils.flattenComponents(form.components, true);
               /* eslint-enable no-unused-vars */
               eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
             }
@@ -63,6 +68,7 @@ module.exports = function(app) {
             clicked = true;
             switch (settings.action) {
               case 'submit':
+                onCustom();
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
