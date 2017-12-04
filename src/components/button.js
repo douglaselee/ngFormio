@@ -41,7 +41,7 @@ module.exports = function(app) {
             return clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
           };
 
-          var onCustom = function() {
+          var onCustom = function(event) {
             if (!$scope.component.custom) {
               return;
             }
@@ -64,17 +64,17 @@ module.exports = function(app) {
             }
           };
 
-          var onClick = function() {
+          var onClick = function(event) {
             clicked = true;
             switch (settings.action) {
               case 'submit':
-                onCustom();
+                onCustom(event);
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
                 break;
               case 'custom':
-                onCustom();
+                onCustom(event);
                 break;
               case 'reset':
                 $scope.resetForm();
@@ -99,12 +99,12 @@ module.exports = function(app) {
             }
           };
 
-          $scope.$on('buttonClick', function(event, component, componentId) {
+          $scope.$on('buttonClick', function(event, component, componentId, $event) {
             // Ensure the componentId's match (even though they always should).
             if (componentId !== $scope.componentId) {
               return;
             }
-            onClick();
+            onClick($event);
           });
 
           $scope.openOAuth = function(settings) {
