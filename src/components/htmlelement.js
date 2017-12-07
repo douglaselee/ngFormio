@@ -36,7 +36,9 @@ module.exports = function(app) {
             });
 
             try {
-              $scope.html = $sanitize(element.prop('outerHTML'));
+            // Skip call to $sanitize because it is removing style attributes
+            //$scope.html = $sanitize(element.prop('outerHTML'));
+              $scope.html =           element.prop('outerHTML');
               $scope.parseError = null;
 
               // If the sanitized html is empty, it was invalid; Create a visible error so we still render something.
