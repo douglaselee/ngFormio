@@ -26,6 +26,7 @@ module.exports = function(app) {
             formioUtils.eachComponent(component.components, function(component) {
               // Don't render disabled fields, or fields with undefined data.
               if (!component.tableView || row[component.key] === undefined) {
+                view += '<td></td>';
                 return;
               }
 
