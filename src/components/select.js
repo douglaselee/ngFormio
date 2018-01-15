@@ -513,6 +513,16 @@ module.exports = function(app) {
                         $scope.selectItems = data;
                       }
 
+                      // If filter retrieved a single item then select it
+                      if ($scope.component.filter && data.length === 1) {
+                        if ($scope.component.multiple) {
+                          $scope.data[$scope.component.key] = data;
+                        }
+                        else {
+                          $scope.data[$scope.component.key] = data[0];
+                        }
+                      }
+
                       // Ensure the value is set to what it should be set to.
                       ensureValue();
                     };
