@@ -26,6 +26,7 @@ module.exports = function(app) {
             formioUtils.eachComponent(component.components, function(component) {
               // Don't render disabled fields, or fields with undefined data.
               if (!component.tableView || row[component.key] === undefined) {
+                view += '<td></td>';
                 return;
               }
 
@@ -163,6 +164,7 @@ module.exports = function(app) {
             var row = scope.row;
             /*eslint-enable no-unused-vars */
 
+            var component = scope.component;
             var custom = scope.component.validate.row;
             custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
               return _get(scope.submission.data, $2);
