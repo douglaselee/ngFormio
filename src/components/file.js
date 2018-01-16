@@ -193,7 +193,45 @@ module.exports = function(app) {
         $scope.component.fileMaxSize = '1GB';
       }
 
-      $scope.upload = function(files) {
+      $scope.$watch('data.' + $scope.component.key, function(value) {
+        // For some reason required validation doesn't fire properly after removing an item from an array which results
+        // in an empty array that is marked as valid. Fix by removing the empty array.
+        if (Array.isArray(value) && value.length === 0) {
+          delete $scope.data[$scope.component.key];
+        }
+      }, true)
+
+      $scope.invalidFiles = [];
+      $scope.currentErrors = [];
+      $scope.upload = function(files, invalidFiles) {
+        if (invalidFiles.length) {
+          angular.forEach(invalidFiles, function(fileError) {
+            if (fileError.$error === 'pattern') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File extension does not match the pattern ' + $scope.component.filePattern;
+            }
+            if (fileError.$error === 'maxSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is larger than the allowed ' + $scope.component.fileMaxSize;
+            }
+            if (fileError.$error === 'minSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is smaller than the allowed ' + $scope.component.fileMinSize;
+            }
+
+            $scope.currentErrors.push(fileError.$error);
+            $scope.formioForm[$scope.componentId].$setValidity(fileError.$error, false);
+            $scope.formioForm[$scope.componentId].$setDirty();
+          });
+          return;
+        }
+        else {
+          angular.forEach($scope.currentErrors, function(err) {
+            $scope.formioForm[$scope.componentId].$setValidity(err, true);
+          });
+          $scope.currentErrors = [];
+        }
+
         if ($scope.component.storage && files && files.length) {
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.

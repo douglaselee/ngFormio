@@ -8,6 +8,8 @@
   ng-model="data[component.key]"
   ng-model-options="{ debounce: 500 }"
   safe-multiple-to-single
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   ng-required="isRequired(component)"
   ng-minlength="component.validate.minLength"
   ng-maxlength="component.validate.maxLength"
@@ -15,7 +17,5 @@
   ng-trim="false" 
   custom-validator="component.validate.custom"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
-  ui-mask="{{ component.inputMask }}"
-  ui-mask-placeholder=""
-  ui-options="uiMaskOptions"
+  formio-mask
 >

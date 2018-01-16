@@ -420,7 +420,10 @@ module.exports = function(app) {
                 else {
                   url = baseUrl;
                   if (settings.data.project) {
-                    url += '/project/' + settings.data.project;
+                    if (settings.data.project.match(/^[0-9a-fA-F]{24}$/)) {
+                      url += '/project';
+                    }
+                    url += '/' + settings.data.project;
                   }
                   url += '/form/' + settings.data.resource + '/submission';
                 }
@@ -588,7 +591,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
-          label: '',
+          label: 'Select Field',
           key: 'selectField',
           placeholder: '',
           data: {

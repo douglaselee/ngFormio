@@ -4,6 +4,81 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.27.2
+### Fixed
+ - Issue with the file upload component where it would not show errors.
+ - Issue with file upload in read-only allowing you to delete files from the grid.
+
+### Changed
+ - Upgraded formio.js to 2.27.6
+
+### Added
+ - Datagrid's add another position logic
+
+## 2.27.1
+### Fixed
+ - Issue where when files are removed, required validation no longer works correctly.
+
+### Changed
+ - Upgraded formiojs to 2.27.3 to fix checkCalculated issue.
+
+## 2.27.0
+### Chagned
+ - Upgraded formiojs dependency.
+ - Changed the clearOnHide option for forms to true.
+
+## 2.26.5
+### Added
+ - Confirmation to cancel a wizard.
+
+### Fixed
+ - Bugfix/button disable
+
+### Changed
+ - Upgraded formiojs to version 2.25.8
+ - Show mask by default on masked fields.
+
+## 2.26.4
+### Fixed
+ - Other regressions with the disabled submit buttons.
+
+## 2.26.3
+### Fixed
+ - Issue with disableOnInvalid flag with pristine forms.
+
+## 2.26.2
+### Fixed
+ - Problems with the disableOnInvalid flag not working with buttons.
+
+## 2.26.1
+### Fixed
+ - Fix nesting forms multiple levvels deep
+ - ng-disabled dynamic update issue
+ - Fix number, currency, and time components issues with new input mask
+
+## 2.26.0
+### Changed
+ - Replaced the ui-mask library and replaced with the core renderer masking system.
+
+## 2.25.9
+### Fixed
+ - Issue with getDownloadUrl by upgrading formio.js
+
+## 2.25.8
+### Fixed
+ - Reverted https://github.com/formio/ngFormio/commit/d7bf526a6d581680d156561972821b63ce65a4b5 which was breaking Select components to resources.
+ - Datagrid not rendering properly in submission view.
+
+### Added
+ - Proper check of Select component project configuration to add /project if it is a mongoId.
+
+## 2.25.7
+### Fixed
+ - Problem with select dropdowns loading within a nested form.
+
+### Added
+ - Possibility to include 'owner' property in submission.
+
 ## 2.25.6
 ### Fixed
  - Issue where the Number component with multiple checked would not render form correctly.

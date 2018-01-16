@@ -14,7 +14,7 @@ module.exports = function(app) {
           input: true,
           tableView: true,
           inputType: 'number',
-          label: '',
+          label: 'Number Field',
           key: 'numberField',
           placeholder: '',
           prefix: '',

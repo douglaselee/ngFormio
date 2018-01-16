@@ -38,7 +38,14 @@ module.exports = function(app) {
           };
 
           $scope.hasError = function() {
-            return clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
+              $scope.disableBtn = true;
+              return true
+            } else {
+              clicked = false;
+              $scope.disableBtn = false;
+              return false
+            }
           };
 
           var onCustom = function(event) {

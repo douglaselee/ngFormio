@@ -13,7 +13,7 @@ module.exports = function() {
       requireComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
-      options: '=?'
+      options: '<'
     },
     controller: [
       '$scope',
@@ -300,6 +300,9 @@ module.exports = function() {
             var submissionData = {data: {}};
             if ($scope.submission._id) {
               submissionData._id = $scope.submission._id;
+            }
+            if ($scope.submission.owner) {
+              submissionData.owner = $scope.submission.owner;
             }
             if ($scope.submission.data._id) {
               submissionData._id = $scope.submission.data._id;
