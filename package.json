@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.27.2",
+  "version": "2.27.4",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -62,8 +62,9 @@
     "ng-file-upload": "^12.2.13",
     "sig-web-tablet": "file:..\\sig-web-tablet",
     "signature_pad": "^2.3.2",
-    "text-mask-all": "github:text-mask/text-mask",
-    "ui-select": "^0.19.8"
+    "text-mask-addons": "^3.7.1",
+    "ui-select": "^0.19.8",
+    "vanilla-text-mask": "^5.0.1"
   },
   "browserify": {
     "transform": [
