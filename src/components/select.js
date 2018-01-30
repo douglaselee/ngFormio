@@ -200,8 +200,18 @@ module.exports = function(app) {
               }
               refreshing = true;
               var tempData = $scope.data[settings.key];
+              var preserve = false;
+
+              // If filter caused auto-select then preserve selection
+              if ($scope.component.filter && $scope.selectItems.length === 1) {
+                if ($scope.component.multiple && tempData == $scope.selectItems
+                || !$scope.component.multiple && tempData == $scope.selectItems[0]) {
+                  preserve = true;
+                }
+              }
+
               $scope.data[settings.key] = settings.multiple ? [] : '';
-              if (!settings.clearOnRefresh) {
+              if (!settings.clearOnRefresh || preserve) {
                 $timeout(function() {
                   $scope.data[settings.key] = tempData;
                   refreshing = false;
