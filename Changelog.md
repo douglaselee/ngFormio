@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.28.2
+### Fixed
+ - Issue with the logic around the Checkbox hidelabel setting.
+ - Problem with ngModel dependency on buttons.
+ - Fix issue where old values stayed in option for "clearOnRefresh"
+
+## 2.28.1
+### Changed
+ - The logic to the button to use new Function instead of eval.
+
+### Added
+ - The _merge method from lodash to be accessible to the custom action on Buttons.
+
+## 2.28.0
+### Changed
+ - Upgrade formiojs to 2.27.0
+
+### Added
+ - Need to introduce a new "action" for buttons that will allow you to provide your own url, where it submits the data to that url. Add on submit button and optional URL to post the data to the url
+ - Need to include in the submission which button was pressed
+ - Autofocus configuration for fields.
+ - Way to disable spellcheck of wysiwyg.
+
+### Fixed
+ - Issue when pressing tab key the data in select persist
+ - Fix datagrids improperly slicing when maxlength set.
+
 ## 2.27.5
 ### Fixed
  - Problem where "_" is undefined for number and currency components.

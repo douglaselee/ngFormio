@@ -1,4 +1,5 @@
 var fs = require('fs');
+var _merge = require('lodash/merge');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -7,6 +8,7 @@ module.exports = function(app) {
         title: 'Button',
         template: 'formio/components/button.html',
         settings: {
+          autofocus: false,
           input: true,
           label: 'Submit',
           tableView: false,
@@ -32,6 +34,8 @@ module.exports = function(app) {
               case 'event':
               case 'custom':
               case 'oauth':
+              case 'url':
+                return;
               default:
                 return 'button';
             }
@@ -40,7 +44,7 @@ module.exports = function(app) {
           $scope.hasError = function() {
             if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               $scope.disableBtn = true;
-              return true
+              return true;
             } else {
               clicked = false;
               $scope.disableBtn = false;
@@ -54,15 +58,14 @@ module.exports = function(app) {
             }
 
             try {
-              /* eslint-disable no-unused-vars */
               var parent = $scope.$parent;
               while (!parent.form) {
                 parent = parent.$parent;
               }
-              var form       = parent.form;
-              var components = FormioUtils.flattenComponents(form.components, true);
-              /* eslint-enable no-unused-vars */
-              eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
+              var flattened = FormioUtils.flattenComponents(parent.form.components, true);
+              var components = flattened;
+              (new Function('event', 'form', 'flattened', 'components', '_merge', 'data', $scope.component.custom.toString()))
+              (event, parent.form, flattened, components, _merge, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
@@ -73,6 +76,8 @@ module.exports = function(app) {
 
           var onClick = function(event) {
             clicked = true;
+
+            $scope.data[$scope.component.key] = true;
             switch (settings.action) {
               case 'submit':
                 onCustom(event);
@@ -82,6 +87,9 @@ module.exports = function(app) {
                 break;
               case 'custom':
                 onCustom(event);
+                break;
+              case 'url':
+                $scope.$emit('submitUrl',{url:$scope.component.url, component: $scope.component});
                 break;
               case 'reset':
                 $scope.resetForm();
