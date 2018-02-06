@@ -4,10 +4,12 @@ module.exports = function(app) {
   app.directive('formioHtmlElement', [
     '$sanitize',
     '$filter',
-    function($sanitize, $filter) {
+    '$interpolate',
+    function($sanitize, $filter, $interpolate) {
       return {
         restrict: 'E',
         scope: {
+          data: '=',
           component: '='
         },
         templateUrl: 'formio/components/htmlelement-directive.html',
@@ -17,13 +19,14 @@ module.exports = function(app) {
             $scope.parseError = 'Invalid HTML: ' + msg.toString();
           };
 
-          $scope.$watch('component', function createElement() {
+          var createElement = function() {
             if (!$scope.component.tag) {
               return displayError('No tag given');
             }
 
             var element = angular.element('<' + $scope.component.tag + '>' + '</' + $scope.component.tag + '>');
-            element.html($filter('formioTranslate')($scope.component.content));
+            var content = $interpolate($scope.component.content)({data: $scope.data});
+            element.html($filter('formioTranslate')(content));
 
             // Add the css classes if supplied.
             if ($scope.component.className) {
@@ -52,7 +55,10 @@ module.exports = function(app) {
                 .split('\n')[0]
                 .replace('[$sanitize:badparse]', '');
             }
-          }, true);
+          };
+          // $watchGroup won't do deep compare
+          $scope.$watch('data',      createElement, true);
+          $scope.$watch('component', createElement, true);
         }
       };
   }]);
@@ -80,7 +86,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/htmlelement.html',
-        '<formio-html-element component="component"></div>'
+        '<formio-html-element data="data" component="component"></div>'
       );
 
       $templateCache.put('formio/components/htmlelement-directive.html',
