@@ -161,7 +161,7 @@ module.exports = [
 
           $scope.getInputGroupStyles = function(component) {
             var labelPosition = _get(component, 'labelPosition');
-            
+
             if (labelOnTheLeftOrRight(labelPosition)) {
               var totalLabelWidth = getComponentLabelWidth(component) + getComponentLabelMargin(component);
               var styles = {
@@ -202,6 +202,10 @@ module.exports = [
           // class to the survey component.
           // Note: Chek that this method is used in the template.
           $scope.invalidQuestions = function(formioForm) {
+            if (!formioForm) {
+              return false;
+            }
+
             var errorInQuestions = false;
             if (!$scope.component.questions) {
               errorInQuestions = false;

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.28.4
+### Added
+ - Emit of 'formError' event on next page for Wizard.
+
+### Fixed
+ - Search Filter setting not working correctly for Select Component with Raw JSON Data Source Type
+ - Arrow keys in Day component.
+ - Formio library to use the "default" export of formiojs.
+ - Issue with subform submissions not loading due to check for empty data.
+
+### Changed
+ - Upgraded formiojs to latest version.
+
+## 2.28.3
+### Added
+ - 'delimiter' property for Number component.
+ -  scope variable to custom buttons
+
+### Fixed
+ - Error messages in console for Survey and EditGrid components.
+ - Prevent WYSIWYG settings from merging unintentionally
+
 ## 2.28.2
 ### Fixed
  - Issue with the logic around the Checkbox hidelabel setting.
