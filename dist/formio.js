@@ -1,4 +1,4 @@
-/*! ng-formio v2.28.4 | https://unpkg.com/ng-formio@2.28.4/LICENSE.txt */
+/*! ng-formio v2.28.6 | https://unpkg.com/ng-formio@2.28.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -7876,6 +7876,18 @@ var ButtonComponent = exports.ButtonComponent = function (_BaseComponent) {
       if (this.shouldDisable) {
         this.disabled = true;
       }
+
+      function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+      };
+
+      // If this is an OpenID Provider initiated login, perform the click event immediately
+      if (this.component.action === 'oauth' && this.component.oauth.authURI.indexOf(getUrlParameter('iss')) === 0) {
+        this.openOauth();
+      }
     }
   }, {
     key: 'openOauth',
@@ -8970,7 +8982,7 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
 
       // Clean up components list.
       Object.keys(this.rows[rowIndex]).forEach(function (key) {
-        _this6.removeComponent(_this6.rows[rowIndex][key], _this6.rows[rowIndex][key].element);
+        _this6.removeComponent(_this6.rows[rowIndex][key]);
       });
       delete this.rows[rowIndex];
     }
@@ -16104,6 +16116,10 @@ var _shallowCopy = _dereq_('shallow-copy');
 
 var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
 
+var _providers = _dereq_('./providers');
+
+var _providers2 = _interopRequireDefault(_providers);
+
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
@@ -17448,7 +17464,7 @@ Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
-Formio.providers = _dereq_('./providers');
+Formio.providers = _providers2.default;
 Formio.events = new _eventemitter.EventEmitter2({
   wildcard: false,
   maxListeners: 0
@@ -18348,8 +18364,20 @@ module.exports = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/
 },{}],54:[function(_dereq_,module,exports){
 'use strict';
 
-module.exports = {
-  storage: _dereq_('./storage')
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _storage = _dereq_('./storage');
+
+var _storage2 = _interopRequireDefault(_storage);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+exports.default = {
+  storage: _storage2.default
 };
 
 },{"./storage":57}],55:[function(_dereq_,module,exports){
@@ -18482,14 +18510,38 @@ exports.default = dropbox;
 },{"native-promise-only":262}],57:[function(_dereq_,module,exports){
 'use strict';
 
-module.exports = {
-  base64: _dereq_('./base64'),
-  dropbox: _dereq_('./dropbox.js'),
-  s3: _dereq_('./s3.js'),
-  url: _dereq_('./url.js')
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _base = _dereq_('./base64');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _dropbox = _dereq_('./dropbox');
+
+var _dropbox2 = _interopRequireDefault(_dropbox);
+
+var _s = _dereq_('./s3');
+
+var _s2 = _interopRequireDefault(_s);
+
+var _url = _dereq_('./url');
+
+var _url2 = _interopRequireDefault(_url);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+exports.default = {
+  base64: _base2.default,
+  dropbox: _dropbox2.default,
+  s3: _s2.default,
+  url: _url2.default
 };
 
-},{"./base64":55,"./dropbox.js":56,"./s3.js":58,"./url.js":59}],58:[function(_dereq_,module,exports){
+},{"./base64":55,"./dropbox":56,"./s3":58,"./url":59}],58:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54098,7 +54150,7 @@ module.exports = function(app) {
           disableOnInvalid: false,
           theme: 'primary'
         },
-        controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
+        controller: ['$scope', '$location', 'FormioUtils', function($scope, $location, FormioUtils) {
           if ($scope.options && $scope.options.building) return;
           var clicked = false;
           var settings = $scope.component;
@@ -54275,6 +54327,11 @@ module.exports = function(app) {
               }
             }, 100);
           };
+
+          // If this is an OpenID Provider initiated login, perform the click event immediately
+          if (settings.action === 'oauth' && settings.oauth.authURI.indexOf($location.search().iss) === 0) {
+            $scope.openOAuth(settings.oauth);
+          }
         }],
         viewTemplate: 'formio/componentsView/button.html'
       });
@@ -54660,6 +54717,7 @@ module.exports = function(app) {
           persistent: true,
           hidden: false,
           clearOnHide: true,
+          delimiter: true,
           validate: {
             required: false,
             multiple: '',
@@ -60950,9 +61008,14 @@ module.exports = function() {
         // FOR-949 - Default value for componenets with input mask.
         else if (component.inputMask) {
           var inputMask = formioUtils.getInputMask(component.inputMask);
-          value = conformToMask(value, inputMask).conformedValue;
-          if (!formioUtils.matchInputMask(value, inputMask)) {
-            value = '';
+          var self = this;
+          if (component.multiple) {
+            value = value.map(function(item) {
+              return self.verifyMaskedInput(item, inputMask);
+            });
+          }
+          else {
+            value = this.verifyMaskedInput(value, inputMask);
           }
           data[component.key] = value;
           return done(true);
@@ -60975,6 +61038,13 @@ module.exports = function() {
         }
       }
       /* eslint-enable max-depth */
+    },
+    verifyMaskedInput: function(input, mask) {
+      input = conformToMask(input, mask).conformedValue;
+      if (!formioUtils.matchInputMask(input, mask)) {
+        return '';
+      }
+      return input;
     },
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
