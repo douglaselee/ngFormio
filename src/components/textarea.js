@@ -93,11 +93,11 @@ module.exports = function(app) {
           }
         ],
         settings: {
-          autofocus: true,
+          autofocus: false,
           input: true,
           tableView: true,
-          label: 'Text Area Field',
-          key: 'textareaField',
+          label: 'Text Area',
+          key: 'textarea',
           placeholder: '',
           prefix: '',
           suffix: '',

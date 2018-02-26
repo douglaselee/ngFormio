@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.29.5
+### Added
+ - Default label for HTML component and hide label.
+
+## 2.29.4
+### Fixed
+ - Ensure that autofocus is set to false for text areas.
+
+## 2.29.3
+### Changed
+ - The default labels and keys to be something more practical.
+
+## 2.29.2
+### Fixed
+ - How labels are shown (or not) within the DataGrid.
+
+## 2.29.1
+### Fixed
+ - Issue where if a component shows its label in a datagrid, it would also show up in the header. That is redundant.
+
+## 2.29.0
+### Changed
+ - The datagrid to use thead for header and tbody for content.
+ - Upgraded formiojs@2.29.6, bootstrap-ui-datetime-picker@2.6.1, eslint@4.18.1, browserify@16.1.0
+
+### Fixed
+ - Many issues with labels and hide label.
+
 ## 2.28.6
 ### Changed
  - Upgraded formio.js to 2.29.3
