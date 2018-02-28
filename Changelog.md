@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.30.1
+### Fixed
+ - Problems where DataGrid would not show labels of input elements in columns.
+
+## 2.30.0
+### Changed
+ - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }} 
+   in order to keep application style collisions to a minimum.
+
+## 2.29.6
+### Fixed
+ - Fixed the label positions for left and right.
+
+### Changed
+ - The provided ID for content components so that it does not collide with page components.
+
 ## 2.29.5
 ### Added
  - Default label for HTML component and hide label.
