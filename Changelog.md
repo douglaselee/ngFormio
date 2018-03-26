@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.31.0
+### Fixed
+ - Fixed default value for Number component.
+ - Table view of Number and Currency components.
+ - Fix issue where editgrid and datagrid don't update when external data is changed.
+ - Removed double loadForm() method from form components.
+ - Fix oauth button crashing when settings aren't set.
+
+### Added
+ - Ability to specify decimalLimit on currency and number (including 0 for integer)
+ - Ability to require decimals
+ - Ability to override decimalSeparator and delimiter per language in options.
+
+### Changed
+ - Preserve original file name and display it if available.
+ - Upgrade formio.js to 2.30.0
+
 ## 2.30.2
 ### Changed
  - Upgraded text-mask-addons@3.7.2, moment@2.21.0, formiojs@2.29.11
@@ -18,7 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.30.0
 ### Changed
- - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }} 
+ - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }}
    in order to keep application style collisions to a minimum.
 
 ## 2.29.6
