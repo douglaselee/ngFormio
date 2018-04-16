@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.32.0
+### Changed
+ - Update submitForm promise handler to be more compatible with other promise libraries.
+
+### Added
+ - Possibility to hide body for Panel and FieldSet.
+ - `getView(component, data)` option for EditGrid body template.
+ - Add data as a variable to editgrid row template.
+ - Add custom validator logic to datagrid.
+
+### Fixed
+ - Components validation inside layout.
+ - Interpolation inside EditGrid.
+ - Select component with multiple values and default value.
+ - Front-end indication on unique validation.
+ - Autofocus feature.
+ - Components navigation using `Tab`.
+ - Select, Address, Resource Disable
+
+## 2.31.2
+### Fixed
+ - Issues with nested form validations.
+
+## 2.31.1
+### Fixed
+ - Validation of nested forms.
+ - Nested form table view.
+ - Spell check for WYSIWYG.
+
+### Changed
+ - Removed uiSelectOpenOnFocus directive.
+
+### Added
+ - Adding "data" variable exposed to EditGrid templates.
+ - Table view for File component.
+
 ## 2.31.0
 ### Fixed
  - Fixed default value for Number component.

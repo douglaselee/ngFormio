@@ -1,4 +1,5 @@
 var _get = require('lodash/get');
+var moment = require('moment');
 
 module.exports = [
   'Formio',
@@ -17,7 +18,7 @@ module.exports = [
         submission: '=',
         hideComponents: '=',
         formio: '=',
-        formioForm: '=',
+        formName: '=',
         readOnly: '=',
         gridRow: '=',
         gridCol: '=',
@@ -50,6 +51,7 @@ module.exports = [
           $timeout
         ) {
           $scope.options = $scope.options || {};
+          $scope.formioForm = $scope.$parent[$scope.formName];
 
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
@@ -266,6 +268,9 @@ module.exports = [
 
                 var valid;
                 try {
+                  if ($scope.component.type === 'datetime') {
+                    $scope.data[$scope.component.key] = moment($scope.data[$scope.component.key]).toISOString();
+                  }
                   valid = FormioUtils.jsonLogic.apply(input, {
                     data: $scope.submission ? $scope.submission.data : $scope.data,
                     row: $scope.data

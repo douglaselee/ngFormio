@@ -6,6 +6,7 @@ var _assign = require('lodash/assign');
 var _set = require('lodash/set');
 var _cloneDeep = require('lodash/cloneDeep');
 var _mapValues = require('lodash/mapValues');
+var _isNil = require('lodash/isNil');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -39,38 +40,6 @@ module.exports = function(app) {
       }
     };
   });
-
-  // A directive to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', [function() {
-    return {
-      require: 'uiSelect',
-      restrict: 'A',
-      link: function($scope, el, attrs, uiSelect) {
-        if ($scope.options && $scope.options.building) return;
-        var focuscount = -1;
-        angular.element(uiSelect.focusser).on('focus', function() {
-          if (focuscount-- < 0) {
-            uiSelect.activate();
-          }
-        });
-        angular.element(el).on('blur keydown', function(e) {
-            if (e.keyCode === 9 || e.key === 'Tab') {
-              uiSelect.clear(e);
-            }
-        });
-
-        // Disable the auto open when this select element has been activated.
-        $scope.$on('uis:activate', function() {
-          focuscount = 1;
-        });
-
-        // Re-enable the auto open after the select element has been closed
-        $scope.$on('uis:close', function() {
-          focuscount = 1;
-        });
-      }
-    };
-  }]);
 
   // Configure the Select component.
   app.config([
@@ -165,6 +134,13 @@ module.exports = function(app) {
             $scope.hasNextPage = false;
             $scope.selectItems = [];
 
+            if (settings.autofocus) {
+              $timeout(function() {
+                var inputs = angular.element('#form-group-' + settings.key).find('input');
+                inputs[settings.multiple ? 0 : 1].focus();
+              });
+            }
+
             var initialized = $q.defer();
             initialized.promise.then(function() {
               $scope.$emit('selectLoaded', $scope.component);
@@ -234,8 +210,8 @@ module.exports = function(app) {
 
             // Ensures that the value is within the select items.
             var ensureValue = function(value) {
-              value = value || $scope.data[settings.key];
-              if (!value || (Array.isArray(value) && value.length === 0)) {
+              value = _isNil(value) ? $scope.data[settings.key] : value;
+              if (_isNil(value) || (Array.isArray(value) && value.length === 0)) {
                 return;
               }
               if (Array.isArray(value)) {
@@ -244,7 +220,7 @@ module.exports = function(app) {
               }
               // Iterate through the list of items and see if our value exists...
               var found = false;
-              for (var i=0; i < $scope.selectItems.length; i++) {
+              for (var i = 0; i < $scope.selectItems.length; i++) {
                 var item = $scope.selectItems[i];
                 var selectItem = $scope.getSelectItem(item);
                 if (_isEqual(selectItem, value)) {
@@ -311,7 +287,7 @@ module.exports = function(app) {
                 // Set the new result.
                 var setResult = function(data, append) {
                   // coerce the data into an array.
-                  if (!(data instanceof Array)) {
+                  if (!Array.isArray(data)) {
                     data = [data];
                   }
 
@@ -518,7 +494,7 @@ module.exports = function(app) {
                     // Set the new result.
                     var setResult = function(data) {
                       // coerce the data into an array.
-                      if (!(data instanceof Array)) {
+                      if (!Array.isArray(data)) {
                         data = [data];
                       }
 
