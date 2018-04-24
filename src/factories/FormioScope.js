@@ -8,15 +8,41 @@ module.exports = [
     $timeout
   ) {
     return {
-      onError: function($scope, $element) {
+      onError: function($scope, $element, form) {
         return function(error) {
           if ((error.name === 'ValidationError') && $element) {
-            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
-            var message = 'ValidationError: ' + error.details[0].message;
-            $scope.showAlerts({
-              type: 'danger',
-              message: message
-            });
+            if (form) {
+              //  Clean up any previous custom errors
+              angular.forEach(form.$$controls, function(control) {
+                if (control.$error.custom) {
+                  $element.find('#form-group-' + control.$name).removeClass('has-error');
+                  delete control.$error.custom;
+                }
+              });
+
+              var alerts = [];
+
+              //  Show any current custom errors
+              angular.forEach(error.details, function(detail) {
+                var alert = {
+                  type: 'danger',
+                  message: 'ValidationError: ' + detail.message
+                };
+                alerts.push(alert);
+                form[detail.path].$error.custom = true;
+                $element.find('#form-group-' + detail.path).addClass('has-error');
+              });
+
+              $scope.showAlerts(alerts);
+            }
+            else {
+              $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+              var message = 'ValidationError: ' + error.details[0].message;
+              $scope.showAlerts({
+                type: 'danger',
+                message: message
+              });
+            }
           }
           else {
             if (error instanceof Error) {

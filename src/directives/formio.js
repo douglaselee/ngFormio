@@ -370,7 +370,7 @@ module.exports = function() {
                 Formio.clearCache();
                 onSubmitDone(method, response.data, form);
               })
-              .catch(FormioScope.onError($scope, $element))
+              .catch(FormioScope.onError($scope, $element, form))
               .finally(function() {
                 if (form) {
                   form.submitting = false;
@@ -390,7 +390,7 @@ module.exports = function() {
                 }
                 onSubmitDone(submissionMethod, submission, form);
               })
-              .catch(FormioScope.onError($scope, $element))
+              .catch(FormioScope.onError($scope, $element, form))
               .finally(function() {
                 if (form) {
                   form.submitting = false;
@@ -438,7 +438,7 @@ module.exports = function() {
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               form.submitting = false;
-              return FormioScope.onError($scope, $element)(err);
+              return FormioScope.onError($scope, $element, form)(err);
             }
 
             // Create a sanitized submission object.
@@ -530,7 +530,7 @@ module.exports = function() {
 
             // Allow an error to be thrown externally.
             $scope.$on('submitError', function(event, error) {
-              FormioScope.onError($scope, $element)(error);
+              FormioScope.onError($scope, $element, form)(error);
               form.submitting = false;
             });
 
