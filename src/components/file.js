@@ -75,6 +75,7 @@ module.exports = function(app) {
           //}
             event.preventDefault();
             $scope.files.splice(index, 1);
+            $scope.$emit('fileRemoved');
           };
 
           $scope.fileSize = function(a, b, c, d, e) {
@@ -107,6 +108,7 @@ module.exports = function(app) {
           //}
             event.preventDefault();
             $scope.files.splice(index, 1);
+            $scope.$emit('fileRemoved');
           };
         }
       ]

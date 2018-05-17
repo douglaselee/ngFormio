@@ -329,9 +329,10 @@ module.exports = function() {
 
               $scope.form.submitting = false;
             }, function (err) {
+              $scope.formioAlerts.length = 0;
               $scope.formioAlerts.push({
                 type: 'danger',
-                message: err.message
+                message: err.data.message
               });
 
               $scope.form.submitting = false;
