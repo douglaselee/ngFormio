@@ -30,17 +30,22 @@ module.exports = [
                 };
                 alerts.push(alert);
                 form[detail.path].$error.custom = true;
-                $element.find('#form-group-' + detail.path).addClass('has-error');
+                var element = $element.find('#form-group-' + error.details[0].path);
+                element.addClass('has-error');
               });
 
               $scope.showAlerts(alerts);
             }
             else {
-              $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+              var element = $element.find('#form-group-' + error.details[0].path);
+              element.addClass('has-error');
               var message = 'ValidationError: ' + error.details[0].message;
               $scope.showAlerts({
                 type: 'danger',
                 message: message
+              });
+              $scope.$on('formSubmit', function() {
+                element.removeClass('has-error');
               });
             }
           }

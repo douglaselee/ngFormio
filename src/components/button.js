@@ -28,6 +28,7 @@ module.exports = function(app) {
           $scope.getButtonType = function() {
             switch (settings.action) {
               case 'submit':
+              case 'saveState':
                 return 'submit';
               case 'reset':
                 return 'reset';
@@ -35,19 +36,21 @@ module.exports = function(app) {
               case 'custom':
               case 'oauth':
               case 'url':
+              case 'delete':
               default:
                 return 'button';
             }
           };
 
           $scope.hasError = function() {
-            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
+            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid) {
               $scope.disableBtn = true;
               return true;
-            } else {
+            }
+            else {
               clicked = false;
               $scope.disableBtn = false;
-              return false
+              return false;
             }
           };
 
@@ -80,6 +83,10 @@ module.exports = function(app) {
             switch (settings.action) {
               case 'submit':
                 onCustom(event);
+                $scope.submission.state = 'submitted';
+                return;
+              case 'saveState':
+                $scope.submission.state = $scope.component.state;
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
@@ -92,6 +99,9 @@ module.exports = function(app) {
                 break;
               case 'reset':
                 $scope.resetForm();
+                break;
+              case 'delete':
+                $scope.deleteSubmission();
                 break;
               case 'oauth':
                 if (!settings.oauth) {
