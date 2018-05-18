@@ -1,5 +1,5 @@
 var fs = require('fs');
-var formioUtils = require('formiojs/utils');
+var formioUtils = require('formiojs/lib/utils').default;
 
 module.exports = function(app) {
   app.config([
