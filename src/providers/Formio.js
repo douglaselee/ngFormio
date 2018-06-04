@@ -1,10 +1,10 @@
 module.exports = function() {
   // The formio class.
-  var Formio = require('formiojs/lib').Formio;
+//var Formio = require('formiojs/lib').Formio;
+  var Formio = require('formiojs/Formio').default;
 
   // Return the provider interface.
   return {
-
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
     getBaseUrl: Formio.getBaseUrl,
@@ -58,6 +58,18 @@ module.exports = function() {
             $rootScope.$broadcast.apply($rootScope, args);
           });
         });
+
+        // Add ability to set the scope base url.
+        Formio.setScopeBase = function($scope) {
+          $scope.baseUrl = $scope.options ? $scope.options.baseUrl : '';
+          if (!$scope.baseUrl && $scope.formio && $scope.formio.projectUrl) {
+            $scope.baseUrl = $scope.formio.projectUrl;
+          }
+          if (!$scope.baseUrl) {
+            $scope.baseUrl = Formio.getBaseUrl();
+          }
+          return $scope.baseUrl;
+        };
 
         // Return the formio interface.
         return Formio;

@@ -1,4 +1,5 @@
-var formioUtils = require('formiojs/lib/utils').default;
+//r formioUtils = require('formiojs/lib/utils').default;
+var formioUtils = require('formiojs/utils').default;
 var conformToMask = require('vanilla-text-mask').conformToMask;
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
@@ -309,6 +310,7 @@ module.exports = function() {
         return item !== '[]';
       })).conformedValue;
     },
+    fieldData: formioUtils.fieldData,
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,
