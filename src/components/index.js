@@ -32,6 +32,7 @@ require('./container')(app);
 require('./datagrid')(app);
 require('./editgrid')(app);
 require('./survey')(app);
+require('./scan')(app);
 
 // Layout
 require('./columns')(app);
