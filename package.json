@@ -54,7 +54,7 @@
     "angular-ui-bootstrap": "^2.5.6",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.6.1",
-    "formiojs": "file:..\\formiojs",
+    "formiojs": "file:..\\formiojs\\lib",
     "jquery": "^3.3.1",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",

@@ -1,6 +1,5 @@
 var maskInput = require('vanilla-text-mask').default;
 var createNumberMask = require('text-mask-addons').createNumberMask;
-//r formioUtils = require('formiojs/lib/utils').default;
 var formioUtils = require('formiojs/utils').default;
 var _ = require('lodash');
 

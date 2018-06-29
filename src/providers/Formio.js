@@ -1,6 +1,5 @@
 module.exports = function() {
   // The formio class.
-//var Formio = require('formiojs/lib').Formio;
   var Formio = require('formiojs/Formio').default;
 
   // Return the provider interface.
