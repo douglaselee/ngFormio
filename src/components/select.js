@@ -143,7 +143,7 @@ module.exports = function(app) {
 
             var initialized = $q.defer();
             initialized.promise.then(function() {
-              $scope.$emit('selectLoaded', $scope.component);
+              $scope.$emit('selectLoaded', $scope.component, $scope.selectItems);
             });
 
             var selectValues = $scope.component.selectValues;
@@ -195,12 +195,12 @@ module.exports = function(app) {
                 $timeout(function() {
                   $scope.data[settings.key] = tempData;
                   refreshing = false;
-                  $scope.$emit('selectLoaded', $scope.component);
+                  $scope.$emit('selectLoaded', $scope.component, $scope.selectItems);
                 });
               }
               else {
                 refreshing = false;
-                $scope.$emit('selectLoaded', $scope.component);
+                $scope.$emit('selectLoaded', $scope.component, $scope.selectItems);
                 var index = $scope.selectItems.indexOf(tempData);
                 if (index !== -1) {
                   $scope.selectItems.splice(index, 1);
