@@ -4,7 +4,7 @@ module.exports = function(gulp, plugins, bundle) {
       entries: './src/formio.js',
       debug: false,
       standalone: 'formio',
-      ignoreMissing: true
+      ignoreMissing: false
     });
 
     return bundle
