@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.4
+### Fixed
+ - Issue where Formio.fieldData is not defined and should use FormioUtils instead.
+
+## 2.25.3
+### Fixed
+ - Issue with build where formiojs was not getting included.
+
+## 2.25.2
+### Changed
+ - Upgraded core renderer and other dependencies.
+
+## 2.35.1
+### Changed
+ - Upgraded core renderer which introduces Okta SSO integration.
+
+## 2.35.0
+### Fixed
+ - File fields where a file was added and removes are crashing data view on portal.
+
+### Changed
+ - Inputs store invalid value.
+
+### Fixed
+ - `tableView` for File component.
+
 ## 2.34.2
 ### Fixed
  - Upgraded formiojs to 3.0.0-rc.4 which contains formData method.
