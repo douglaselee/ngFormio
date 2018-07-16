@@ -37,6 +37,14 @@ module.exports = function(app) {
       });
     }
   ]);
+  app.controller('formioSignatureComponent', [
+    '$scope',
+    function($scope) {
+      $scope.$on('clearComponent', function() {
+        $scope.component.clearSignature();
+      });
+    }
+  ]);
   app.directive('signature', function() {
     return {
       restrict: 'A',
