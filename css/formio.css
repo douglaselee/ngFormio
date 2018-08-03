@@ -293,3 +293,14 @@ input[type="password"][draggable="true"] {
   /*margin-left: 24.999999995%; */
   /*}*/
 }
+
+@media print {
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+}
+
