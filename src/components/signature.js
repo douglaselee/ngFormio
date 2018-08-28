@@ -28,6 +28,7 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           hidden: false,
+          zoom: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -45,7 +46,7 @@ module.exports = function(app) {
       });
     }
   ]);
-  app.directive('signature', function() {
+  app.directive('signature', ['ngDialog', function(ngDialog) {
     return {
       restrict: 'A',
       scope: {
@@ -64,6 +65,10 @@ module.exports = function(app) {
 
         // Sets the dimension of a width or height.
         var setDimension = function(dim) {
+          var param = dim === 'width' ? 'clientWidth' : 'clientHeight';
+          element[0][dim] = element.parent().eq(0)[0][param];
+          return;
+
           var param = (dim === 'width') ? 'clientWidth' : 'clientHeight';
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
@@ -165,6 +170,72 @@ module.exports = function(app) {
           }
         };
 
+        // Pop up dialog for signing in small spaces
+        scope.component.zoomIn = function($event) {
+          if (!scope.component.zoom) {
+            return;
+          }
+
+          $event.preventDefault();
+          $event.target.blur(); 
+
+          var template  = '<br>' +
+                          '<div class="row">' +
+                            '<div class="col-sm-12">' +
+                              '<div class="panel panel-default">' +
+                                '<div class="panel-heading">' +
+                                  '<h3 class="panel-title">{{ "Signature" | formioTranslate}}</h3>' +
+                                '</div>' +
+                                '<div class="panel-body">' +
+                                  '<formio src="src" submission="sub"></formio>' +
+                                '</div>' +
+                              '</div>' +
+                            '</div>' +
+                          '</div>';
+
+          ngDialog.open({
+            template: template,
+            plain: true,
+            scope: scope,
+            controller: ['$scope', 'Formio', function($scope, Formio) {
+              $scope.src = scope.src = Formio.getApiUrl() + '/zoomsignature';
+              $scope.sub = scope.sub = {data: {signature: signaturePad.toDataURL()}};
+
+              $scope.$on('formLoad', function(event, form) {
+                event.stopPropagation(); // Don't confuse app
+                var dialogWidth   = 0.65;
+                var dialogPadding = 16.5;
+                var panelPadding  = 15.0;
+
+                // Calculate signature width and height to maintain their ratio
+                form.components[0].width  = window.innerWidth * dialogWidth - 2 * dialogPadding - 2 * panelPadding;
+                form.components[0].height = form.components[0].width * element[0].height / element[0].width;
+
+                // Copy other signature settings
+                form.components[0].footer          = scope.component.footer;
+                form.components[0].tooltip         = scope.component.tooltip;
+                form.components[0].backgroundColor = scope.component.backgroundColor;
+                form.components[0].penColor        = scope.component.penColor;
+                form.components[0].customClass     = scope.component.customClass;
+              });
+
+              $scope.$on('save', function() {
+                $scope.closeThisDialog(true);
+              });
+
+              $scope.$on('cancel', function() {
+                $scope.closeThisDialog(false);
+              });
+            }]
+          }).closePromise.then(function(e) {
+            if (e.value === true) {
+              signaturePad.clear();
+              signaturePad.fromDataURL(scope.sub.data.signature);
+              ngModel.$setViewValue(scope.sub.data.signature);
+            }
+          });
+        };
+
         // Set some CSS properties.
         element.css({
           'border-radius': '4px',
@@ -190,7 +261,7 @@ module.exports = function(app) {
         };
       }
     };
-  });
+  }]);
   app.run([
     '$templateCache',
     'FormioUtils',
